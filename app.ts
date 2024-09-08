@@ -1,4 +1,3 @@
-// Function to generate the resume based on form input
 const generateResume = () => {
     const username = (document.getElementById('username') as HTMLInputElement).value;
     const name = (document.getElementById('name') as HTMLInputElement).value;
@@ -8,7 +7,6 @@ const generateResume = () => {
     const workExperience = (document.getElementById('work-experience') as HTMLTextAreaElement).value;
     const skills = (document.getElementById('skills') as HTMLTextAreaElement).value;
 
-    // Update the resume sections with the form data
     (document.getElementById('resume-name') as HTMLHeadingElement).textContent = name;
     (document.getElementById('resume-email') as HTMLParagraphElement).textContent = `Email: ${email}`;
     (document.getElementById('resume-phone') as HTMLParagraphElement).textContent = `Phone: ${phone}`;
@@ -16,21 +14,17 @@ const generateResume = () => {
     (document.getElementById('resume-work-experience') as HTMLParagraphElement).textContent = workExperience;
     (document.getElementById('resume-skills') as HTMLParagraphElement).textContent = skills;
 
-    // Store resume data in localStorage with a unique key
     localStorage.setItem(`${username}-resume`, JSON.stringify({ name, email, phone, education, workExperience, skills }));
 
-    // Generate a unique URL (simulation)
-    const uniqueUrl = `http://localhost:8000/resume.html?username=${username}`;
+    const uniqueUrl = `https://milestone-5-three.vercel.app/?username=${username}`;
     (document.getElementById('share-link') as HTMLAnchorElement).href = uniqueUrl;
     (document.getElementById('share-link') as HTMLAnchorElement).textContent = uniqueUrl;
     document.getElementById('share-link-container')?.classList.remove('hidden');
 
-    // Show the resume section and hide the form
     document.getElementById('resume')?.classList.remove('hidden');
     document.getElementById('resume-form')?.classList.add('hidden');
 };
 
-// Function to handle content-editable interactions
 const makeEditable = () => {
     const editableElements = document.querySelectorAll('.editable p');
 
@@ -39,12 +33,10 @@ const makeEditable = () => {
             const target = event.target as HTMLElement;
             const section = target.closest('.editable')?.getAttribute('data-section');
             if (section) {
-                // Store the updated content
                 localStorage.setItem(section, target.textContent || '');
             }
         });
 
-        // Restore previously saved content
         const section = element.closest('.editable')?.getAttribute('data-section');
         if (section) {
             const savedContent = localStorage.getItem(section);
@@ -55,15 +47,32 @@ const makeEditable = () => {
     });
 };
 
-// Function to download the resume as a PDF
 const downloadPDF = () => {
-    // const pdf = document.getElementById("resume")
     window.print()
+};
+const sharePage = () => {
+    const shareButton = document.getElementById('share-page') as HTMLButtonElement;
+    const pageUrl = window.location.href; 
+    const pageTitle = document.title; 
+
+    if (navigator.share) {
+        navigator.share({
+            title: pageTitle,
+            url: pageUrl
+        }).then(() => {
+            console.log('Thanks for sharing!');
+        }).catch((error) => {
+            console.log('Error sharing:', error);
+        });
+    } else {
+        alert('Share functionality is not supported on this browser.');
+    }
 };
 
 // Add event listeners to buttons
 const generateButton = document.getElementById('generate-resume');
 const downloadButton = document.getElementById('download-pdf');
+const shareButton = document.getElementById('share-page');
 
 if (generateButton) {
     generateButton.addEventListener('click', () => {
@@ -77,5 +86,7 @@ if (downloadButton) {
     downloadButton.addEventListener('click', downloadPDF);
 }
 
-// Initialize editable content from local storage on page load
+if (shareButton) {
+    shareButton.addEventListener('click', sharePage);
+}
 document.addEventListener('DOMContentLoaded', makeEditable);
